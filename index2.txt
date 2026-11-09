@@ -1,0 +1,177 @@
+      let currentQuestionIndex = 0;
+      let score = 0;
+
+      function startQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        startScreen.classList.add("hidden");
+        resultScreen.classList.add("hidden");
+        quizScreen.classList.remove("hidden");
+        showQuestion();
+      }
+
+      function showQuestion() {
+        const currentQuestion = quizQuestions[currentQuestionIndex];
+        questionCount.textContent = `Question ${currentQuestionIndex + 1} of ${quizQuestions.length}`;
+        scoreText.textContent = `Score: ${score}`;
+        questionText.textContent = currentQuestion.question;
+        answerButtons.innerHTML = "";
+        feedbackBox.className = "mt-5 hidden rounded-md border p-4 text-sm font-medium";
+        nextBtn.classList.add("hidden");
+        nextBtn.disabled = false;
+
+        currentQuestion.answers.forEach((answer) => {
+          const button = document.createElement("button");
+          button.textContent = answer;
+          button.className =
+            "w-full rounded-md border border-slate-300 bg-white px-4 py-3 text-left font-medium transition hover:bg-slate-50";
+          button.addEventListener("click", () => checkAnswer(answer));
+          answerButtons.appendChild(button);
+        });
+      }
+
+      function checkAnswer(selectedAnswer) {
+        const currentQuestion = quizQuestions[currentQuestionIndex];
+
+        if (selectedAnswer === currentQuestion.correctAnswer) {
+          score++;
+          feedbackBox.className =
+            "mt-5 rounded-md border border-green-300 bg-green-50 p-4 text-sm font-medium text-green-800";
+          feedbackBox.textContent = "Correct answer!";
+        } else {
+          feedbackBox.className =
+            "mt-5 rounded-md border border-red-300 bg-red-50 p-4 text-sm font-medium text-red-800";
+          feedbackBox.textContent = `Incorrect. Correct answer: ${currentQuestion.correctAnswer}`;
+        }
+
+        for (const button of answerButtons.children) {
+          button.disabled = true;
+
+          if (button.textContent === currentQuestion.correctAnswer) {
+            button.className =
+              "w-full rounded-md border border-green-600 bg-green-100 px-4 py-3 text-left font-semibold text-green-800";
+          } else if (button.textContent === selectedAnswer) {
+            button.className =
+              "w-full rounded-md border border-red-600 bg-red-100 px-4 py-3 text-left font-semibold text-red-800";
+          } else {
+            button.className =
+              "w-full rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-left font-medium text-slate-500";
+          }
+        }
+
+        scoreText.textContent = `Score: ${score}`;
+        nextBtn.textContent =
+          currentQuestionIndex === quizQuestions.length - 1 ? "Show Results" : "Next Question";
+        nextBtn.classList.remove("hidden");
+      }
+
+      function goToNextQuestion() {
+        currentQuestionIndex++;
+
+        if (currentQuestionIndex < quizQuestions.length) {
+          showQuestion();
+        } else {
+          showResults();
+        }
+      }
+
+      function showResults() {
+        quizScreen.classList.add("hidden");
+        resultScreen.classList.remove("hidden");
+        finalScore.textContent = `${score} / ${quizQuestions.length}`;
+      }
+
+      startBtn.addEventListener("click", startQuiz);
+      nextBtn.addEventListener("click", goToNextQuestion);
+
+
+
+
+
+
+
+
+
+
+
+
+    // Start quiz
+    function startQuiz() {
+      startScreen.classList.add("hidden");
+      quizScreen.classList.remove("hidden");
+      showQuestion();
+    }
+
+    // Show question
+    function showQuestion() {
+      let q = questions[index];
+
+      document.getElementById("question-count").textContent =
+        `Question ${index + 1} of ${questions.length}`;
+
+      document.getElementById("score").textContent = `Score: ${score}`;
+      questionText.textContent = q.question;
+
+      answerButtons.innerHTML = "";
+      feedback.classList.add("hidden");
+      nextBtn.classList.add("hidden");
+
+      q.answers.forEach(answer => {
+        let btn = document.createElement("button");
+
+        btn.textContent = answer;
+        btn.className = "border p-3 rounded hover:bg-gray-100";
+
+        btn.onclick = () => checkAnswer(btn, answer);
+
+        answerButtons.appendChild(btn);
+      });
+    }
+
+    // Check answer
+    function checkAnswer(selectedBtn, answer) {
+      let correct = questions[index].correct;
+
+      if (answer === correct) {
+        score++;
+        feedback.textContent = "Correct answer!";
+      } else {
+        feedback.textContent = `Wrong answer! Correct answer: ${correct}`;
+      }
+
+      [...answerButtons.children].forEach(btn => {
+        btn.disabled = true;
+
+        if (btn.textContent === correct) {
+          btn.classList.add("bg-green-300");
+        } else if (btn === selectedBtn) {
+          btn.classList.add("bg-red-300");
+        }
+      });
+
+      feedback.classList.remove("hidden");
+      document.getElementById("score").textContent = `Score: ${score}`;
+
+      nextBtn.textContent =
+        index === questions.length - 1 ? "Show Results" : "Next Question";
+
+      nextBtn.classList.remove("hidden");
+    }
+
+    // Next question
+    function nextQuestion() {
+      index++;
+
+      if (index < questions.length) {
+        showQuestion();
+      } else {
+        quizScreen.classList.add("hidden");
+        resultScreen.classList.remove("hidden");
+
+        document.getElementById("final-score").textContent =
+          `${score} / ${questions.length}`;
+      }
+    }
+
+    document.getElementById("start-btn").onclick = startQuiz;
+    nextBtn.onclick = nextQuestion;

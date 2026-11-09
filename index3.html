@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen bg-slate-100 flex items-center justify-center p-4">
+
+  <!-- Start Screen -->
+  <section id="start-screen" class="bg-white p-8 rounded-lg shadow text-center w-full max-w-xl">
+    <h1 class="text-3xl font-bold mb-4">JavaScript Quiz</h1>
+    <p class="text-gray-600 mb-6">Answer the questions and test your knowledge!</p>
+    <button id="start-btn" class="bg-indigo-600 text-white px-6 py-3 rounded">
+      Start Quiz
+    </button>
+  </section>
+
+  <!-- Quiz Screen -->
+  <section id="quiz-screen" class="hidden bg-white p-6 rounded-lg shadow w-full max-w-xl">
+
+    <p id="question-count" class="text-indigo-600 mb-2"></p>
+    <p id="score" class="text-gray-500 mb-4">Score: 0</p>
+
+    <div class="border rounded-lg p-5">
+      <h2 id="question-text" class="text-xl font-bold mb-5"></h2>
+      <div id="answer-buttons" class="grid gap-3"></div>
+    </div>
+
+    <div id="feedback-box" class="hidden mt-4 p-3 rounded"></div>
+
+    <button id="next-btn" class="hidden bg-gray-900 text-white p-3 rounded w-full mt-4">
+      Next Question
+    </button>
+
+  </section>
+
+  <!-- Result Screen -->
+  <section id="result-screen" class="hidden bg-white p-8 rounded-lg shadow text-center w-full max-w-xl">
+    <h1 class="text-3xl font-bold mb-4">Quiz Completed!</h1>
+    <p class="text-xl mb-6">
+      Your Score: <span id="final-score"></span>
+    </p>
+    <button onclick="location.reload()" class="bg-indigo-600 text-white px-6 py-3 rounded">
+      Play Again
+    </button>
+  </section>
+
+  <script>
+    const questions = [
+        {
+            question: "Which language adds interactivity to a webpage?",
+            answers: ["HTML", "CSS", "JavaScript", "SQL"],
+            correct: "JavaScript"
+        },
+        {
+            question: "Which tag connects a JavaScript file?",
+            answers: ["style", "script", "link", "meta"],
+            correct: "script"
+        },
+        {
+            question: "Which CSS framework is used in this page?",
+            answers: ["Bootstrap", "Tailwind CSS", "Bulma", "React"],
+            correct: "Tailwind CSS"
+        },
+        {
+            question: "Which method selects an element by its ID?",
+            answers: ["queryId()", "getElementById()", "selectId()", "findById()"],
+            correct: "getElementById()"
+        },
+        {
+            question: "What does JSON store?",
+            answers: ["Structured data", "Images", "Videos", "Audio"],
+            correct: "Structured data"
+        }
+    ]
+
+    let index = 0
+    let score = 0
+
+    const startScreen = document.getElementById("start-screen")
+    const quizScreen = document.getElementById("quiz-screen")
+    const resultScreen = document.getElementById("result-screen")
+    const questionText = document.getElementById("question-text")
+    const answerButtons = document.getElementById("answer-buttons")
+    const feedback = document.getElementById("feedback-box")
+    const nextBtn = document.getElementById("next-btn")
+    const questionCount = document.getElementById("question-count")
+    const liveScore = document.getElementById("score")
+
+    const startQuiz = () => {
+        startScreen.classList.add("hidden")
+        quizScreen.classList.remove("hidden")
+        showQuestion()
+    }
+
+    const showQuestion = () => {
+        let currentQuestion = questions[index]
+        questionCount.textContent = `Question ${index + 1} of ${questions.length}`
+        liveScore.textContent = `Score: ${score}`
+        questionText.textContent = currentQuestion.question
+        answerButtons.innerHTML = ""
+        feedback.className = "hidden mt-4 p-3 rounded"
+        nextBtn.classList.add("hidden")
+
+        const buttons = currentQuestion.answers.map(option => {
+            const btn = document.createElement("button")
+            btn.textContent = option
+            btn.className = "border p-3 rounded hover:bg-gray-100"
+            btn.onclick = () => checkAnswer(btn, option)
+            return btn
+        })
+        answerButtons.append(...buttons)
+    }
+
+    const checkAnswer = (btn, option) => {
+        let correctAns = questions[index].correct
+
+        if (option == correctAns) {
+            score++
+            feedback.textContent = "Correct answer!"
+            feedback.classList.add("bg-green-100", "text-green-800")
+        } else {
+            feedback.textContent = `Wrong answer! Correct answer: ${correctAns}`
+            feedback.classList.add("bg-red-100", "text-red-800")
+        }
+
+        // color the buttons and lock them so you can't answer twice
+        const allButtons = [...answerButtons.children]
+        allButtons.forEach(b => {
+            b.disabled = true
+            b.classList.remove("hover:bg-gray-100")
+
+            if (b.textContent === correctAns) {
+                b.classList.add("bg-green-300")
+            } else if (b === btn) {
+                b.classList.add("bg-red-300")
+            }
+        })
+
+        feedback.classList.remove("hidden")
+        liveScore.textContent = `Score: ${score}`
+        nextBtn.textContent = index === questions.length - 1 ? "Show Results" : "Next Question"
+        nextBtn.classList.remove("hidden")
+    }
+
+    const nextQuestion = () => {
+        index++
+
+        if (index < questions.length) {
+            showQuestion()
+        } else {
+            quizScreen.classList.add("hidden")
+            resultScreen.classList.remove("hidden")
+            document.getElementById("final-score").textContent = `${score} / ${questions.length}`
+        }
+    }
+
+    document.getElementById("start-btn").onclick = startQuiz
+    nextBtn.onclick = nextQuestion
+</script>
+
+</body>
+</html>
